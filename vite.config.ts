@@ -1,23 +1,13 @@
-import tailwindcss from '@tailwindcss/vite';
-import react from '@vitejs/plugin-react';
-import path from 'path';
-import { defineConfig } from 'vite';
+import tailwindcss from "@tailwindcss/vite";
+import react from "@vitejs/plugin-react";
+import { defineConfig } from "vite";
 
-export default defineConfig(() => {
-  return {
-    base: '/portfolio/',
-    plugins: [react(), tailwindcss()],
-    resolve: {
-      alias: {
-        '@': path.resolve(__dirname, '.'),
-      },
-    },
-    server: {
-      // HMR is disabled in AI Studio via DISABLE_HMR env var.
-      // Do not modifyâfile watching is disabled to prevent flickering during agent edits.
-      hmr: process.env.DISABLE_HMR !== 'true',
-      // Disable file watching when DISABLE_HMR is true to save CPU during agent edits.
-      watch: process.env.DISABLE_HMR === 'true' ? null : {},
-    },
-  };
+// Deployed to GitHub Pages at https://hoangan-bonieeror.github.io/portfolio/
+export default defineConfig({
+  base: "/portfolio/",
+  plugins: [react(), tailwindcss()],
+  build: {
+    // The 3D engine is loaded lazily in its own chunk (see Hero.tsx).
+    chunkSizeWarningLimit: 1200,
+  },
 });

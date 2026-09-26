@@ -1,71 +1,109 @@
-import { Briefcase, Calendar, MapPin, ChevronRight } from "lucide-react";
-import { useLanguage } from "../contexts/LanguageContext";
+import { Bot, Briefcase, Fingerprint, LayoutDashboard, Route, Siren } from "lucide-react";
+import { jobs, workProjects, type WorkProject } from "../content";
+import { ResponsePanel } from "./ResponsePanel";
+import { TiltCard } from "./TiltCard";
+import { EndpointHeading, Reveal } from "./ui";
+
+const kindIcon: Record<WorkProject["kind"], typeof Bot> = {
+  robot: Bot,
+  sensor: Siren,
+  dashboard: LayoutDashboard,
+  route: Route,
+  fingerprint: Fingerprint,
+};
+
+const kindTone: Record<WorkProject["kind"], string> = {
+  robot: "from-amber to-rose",
+  sensor: "from-rose to-amber",
+  dashboard: "from-accent to-mint",
+  route: "from-mint to-accent",
+  fingerprint: "from-accent to-rose",
+};
 
 export default function Experience() {
-  const { t } = useLanguage();
-  const e = t.experience;
-
-  const bulletPoints = [e.bullet1, e.bullet2, e.bullet3, e.bullet4, e.bullet5];
-
   return (
-    <section id="experience" className="py-24 bg-white dark:bg-slate-950 relative">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
-        <div className="text-center md:text-left mb-16">
-          <h2 className="text-sm font-mono uppercase tracking-widest text-teal-600 dark:text-teal-400 font-bold mb-2">
-            {e.sectionLabel}
-          </h2>
-          <h3 className="text-3xl sm:text-4xl font-display font-bold text-slate-900 dark:text-white">
-            {e.heading}
-          </h3>
-          <div className="mt-4 w-12 h-1 bg-gradient-to-r from-sky-500 to-teal-400 rounded-full mx-auto md:mx-0" />
-        </div>
+    <section id="experience" className="py-20 sm:py-28">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <Reveal>
+          <EndpointHeading
+            path="/v1/experience"
+            title="Where I've worked"
+            lead="Production software for factories — where an API outage means robots stop moving."
+          />
+        </Reveal>
 
-        {/* Experience Timeline Container */}
-        <div className="max-w-4xl mx-auto relative border-l-2 border-slate-200 dark:border-slate-800 ml-4 md:ml-10 pl-6 md:pl-10 space-y-12 py-4">
-
-          {/* Timeline Dot Indicator */}
-          <div className="absolute -left-[11px] top-4 w-5 h-5 rounded-full bg-gradient-to-tr from-sky-500 to-teal-400 p-1 shadow-md shadow-sky-500/20">
-            <div className="w-full h-full rounded-full bg-white dark:bg-slate-950" />
-          </div>
-
-          {/* Experience Entry Item */}
-          <div className="space-y-4">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-900 pb-4">
-              <div>
-                <h4 className="text-xl md:text-2xl font-display font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                  <Briefcase className="w-5 h-5 text-sky-500 shrink-0" />
-                  {e.role}
-                </h4>
-                <p className="text-base font-medium text-slate-700 dark:text-slate-300 font-sans mt-1">
-                  {e.company}
-                </p>
-              </div>
-
-              {/* Badges containing metadata */}
-              <div className="flex flex-wrap gap-2 text-xs font-mono text-slate-500 dark:text-slate-400">
-                <span className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
-                  <Calendar className="w-3.5 h-3.5 text-teal-500" />
-                  {e.period}
+        {jobs.map((job) => (
+          <Reveal key={job.company + job.start}>
+            <ResponsePanel path={`/v1/experience/${job.company.toLowerCase().replace(/\s+/g, "-")}`} data={job} className="mb-12">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-accent-soft text-accent">
+                  <Briefcase className="h-6 w-6" />
                 </span>
-                <span className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
-                  <MapPin className="w-3.5 h-3.5 text-teal-500" />
-                  {e.type}
-                </span>
-              </div>
-            </div>
-
-            {/* Bullet Points */}
-            <div className="space-y-4 pt-2">
-              {bulletPoints.map((bullet, index) => (
-                <div key={index} className="flex items-start gap-3 text-slate-600 dark:text-slate-400 font-sans text-sm md:text-base leading-relaxed">
-                  <ChevronRight className="w-4 h-4 text-sky-500 shrink-0 mt-1" />
-                  <p>{bullet}</p>
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                    <h3 className="font-display text-2xl font-bold">{job.role}</h3>
+                    <span className="font-mono text-sm text-muted">
+                      {job.start} — {job.end}
+                    </span>
+                  </div>
+                  <p className="mt-1 font-medium">
+                    {job.company}
+                    {job.companyNote && <span className="font-normal text-muted"> · {job.companyNote}</span>}
+                  </p>
+                  <p className="mt-3 leading-relaxed text-muted">{job.summary}</p>
+                  <ul className="mt-4 space-y-2.5">
+                    {job.bullets.map((b, i) => (
+                      <li key={i} className="flex gap-3 leading-relaxed">
+                        <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-mint" />
+                        <span className="text-muted">{b}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
+            </ResponsePanel>
+          </Reveal>
+        ))}
 
+        <Reveal>
+          <h3 className="mb-5 font-display text-2xl font-bold">Selected work projects</h3>
+        </Reveal>
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {workProjects.map((w, i) => {
+            const Icon = kindIcon[w.kind];
+            return (
+              <Reveal key={w.slug} delay={Math.min(i, 4) * 0.06}>
+                <TiltCard className="p-5 sm:p-6">
+                  <div className="preserve-3d flex h-full flex-col">
+                    {/* Layered 3D icon tile */}
+                    <div className="preserve-3d relative mb-5 h-14 w-14">
+                      <span className={`absolute inset-0 translate-x-1.5 translate-y-1.5 rounded-2xl bg-gradient-to-br opacity-30 blur-[2px] ${kindTone[w.kind]}`} aria-hidden />
+                      <span className={`absolute inset-0 grid place-items-center rounded-2xl bg-gradient-to-br text-white shadow-soft ${kindTone[w.kind]}`} style={{ transform: "translateZ(50px)" }}>
+                        <Icon className="h-7 w-7" />
+                      </span>
+                    </div>
+                    <h4 className="lift-z font-display text-lg font-bold leading-snug">{w.title}</h4>
+                    <p className="lift-z mt-1.5 text-sm text-muted">{w.summary}</p>
+                    <ul className="lift-z mt-4 space-y-1.5 text-sm">
+                      {w.contributions.map((c, j) => (
+                        <li key={j} className="flex gap-2 text-muted">
+                          <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-muted" />
+                          {c}
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="lift-z mt-auto flex flex-wrap gap-1.5 pt-5">
+                      {w.stack.map((s) => (
+                        <span key={s} className="rounded-md bg-surface-2 px-2 py-0.5 font-mono text-[11px] text-muted">
+                          {s}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </TiltCard>
+              </Reveal>
+            );
+          })}
         </div>
       </div>
     </section>

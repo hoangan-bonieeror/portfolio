@@ -1,47 +1,24 @@
-import { ArrowUp, Terminal } from "lucide-react";
-import { useLanguage } from "../contexts/LanguageContext";
+import { ArrowUp } from "lucide-react";
+import { profile } from "../content";
 
 export default function Footer() {
-  const { t } = useLanguage();
-  const f = t.footer;
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
   return (
-    <footer className="bg-white dark:bg-slate-950 border-t border-slate-200/80 dark:border-slate-900/60 py-12 relative z-10">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-
-          {/* Logo & Info */}
-          <div className="flex items-center gap-2 font-display font-bold text-slate-800 dark:text-slate-200">
-            <div className="w-6 h-6 rounded bg-gradient-to-tr from-sky-500 to-teal-400 flex items-center justify-center text-white text-xs">
-              <Terminal className="w-3.5 h-3.5" />
-            </div>
-            <span>An Nguyen</span>
-            <span className="text-slate-300 dark:text-slate-800">|</span>
-            <span className="text-xs font-mono font-normal text-slate-400">
-              {f.role}
-            </span>
-          </div>
-
-          {/* Copyrights */}
-          <div className="text-xs font-mono text-slate-400 text-center md:text-right">
-            <p>© {new Date().getFullYear()} An Nguyen. {f.rights}</p>
-            <p className="mt-1 text-[10px] text-slate-500">{f.crafted}</p>
-          </div>
-
-          {/* Back to top Button */}
-          <button
-            onClick={scrollToTop}
-            className="p-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200/60 dark:border-slate-800/60 transition-colors cursor-pointer group"
-            aria-label="Scroll to top"
-          >
-            <ArrowUp className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" />
-          </button>
-
-        </div>
+    <footer className="border-t border-line py-10">
+      <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 px-4 text-sm text-muted sm:flex-row sm:px-6">
+        <span className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1.5 font-mono text-xs">
+          <span className="h-2 w-2 rounded-full bg-mint" />
+          All systems operational
+        </span>
+        <p className="sm:ml-2">
+          © {new Date().getFullYear()} {profile.name} · Built with React, Three.js & Tailwind
+        </p>
+        <button
+          type="button"
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 transition hover:bg-surface-2 hover:text-ink sm:ml-auto"
+        >
+          <ArrowUp className="h-4 w-4" /> Back to top
+        </button>
       </div>
     </footer>
   );
