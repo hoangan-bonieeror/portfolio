@@ -3,39 +3,46 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>An Nguyen | Software Developer | Full-Stack & Robotics Automation</title>
-		 <link rel="icon" href="/portfolio/assets/favicon-DPNbGho3.svg" type="image/svg">
-    <script>
-      (function() {
-        const pathname = window.location.pathname;
-        const repoName = "/portfolio";
-        
-        // Define valid entry routes
-        const isValidPath = 
-          pathname === '/' || 
-          pathname === '/index.html' || 
-          pathname === repoName || 
-          pathname === repoName + '/' || 
-          pathname === repoName + '/index.html';
-        
-        // Exclude asset file requests and internal Vite dev server paths
-        const isAssetOrDev = 
-          pathname.includes('.') || 
-          pathname.startsWith('/src/') || 
-          pathname.startsWith('/@') || 
-          pathname.startsWith('/node_modules/');
+    <title>An Nguyen — Backend Developer</title>
+    <meta
+      name="description"
+      content="An Nguyen is a Backend Developer who builds Python APIs, PostgreSQL data models and data pipelines — plus the systems that connect software to real hardware. Open to Backend and Software Developer roles."
+    />
+    <meta name="author" content="An Nguyen" />
+    <meta name="theme-color" content="#F6F4EF" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0D0F1A" media="(prefers-color-scheme: dark)" />
 
-        if (!isValidPath && !isAssetOrDev) {
-          const redirectPath = pathname.startsWith(repoName) ? (repoName + '/404.html') : '/404.html';
-          window.location.href = redirectPath;
-        }
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="An Nguyen — Backend Developer" />
+    <meta
+      property="og:description"
+      content="APIs, data models and pipelines — with a background in robotics and industrial automation."
+    />
+    <meta property="og:url" content="https://hoangan-bonieeror.github.io/portfolio/" />
+
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Apply the saved / system theme before first paint to avoid a flash. -->
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem("theme");
+          var dark = saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+          if (dark) document.documentElement.classList.add("dark");
+        } catch (e) {}
       })();
     </script>
-    <script type="module" crossorigin src="/portfolio/assets/index-CYN6YSIK.js"></script>
-    <link rel="stylesheet" crossorigin href="/portfolio/assets/index-BR4KQC2-.css">
+    <script type="module" crossorigin src="/portfolio/assets/index-5SjzWSGP.js"></script>
+    <link rel="stylesheet" crossorigin href="/portfolio/assets/index-DCf38_wS.css">
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"></div>
   </body>
 </html>
-
