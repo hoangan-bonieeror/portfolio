@@ -10,10 +10,13 @@ const levelMeta: Record<SkillLevel, { label: string; dots: number; className: st
   learning: { label: "Learning now", dots: 1, className: "text-amber" },
 };
 
-function LevelDots({ level }: { level: SkillLevel }) {
+function LevelDots({ level, decorative = false }: { level: SkillLevel; decorative?: boolean }) {
   const m = levelMeta[level];
   return (
-    <span className={`flex gap-0.5 ${m.className}`} title={m.label} aria-label={m.label}>
+    <span
+      className={`flex gap-0.5 ${m.className}`}
+      {...(decorative ? { "aria-hidden": true } : { role: "img", "aria-label": m.label, title: m.label })}
+    >
       {[0, 1, 2].map((i) => (
         <span key={i} className={`h-1.5 w-1.5 rounded-full ${i < m.dots ? "bg-current" : "bg-line"}`} />
       ))}
@@ -38,7 +41,7 @@ export default function Skills() {
             <div className="mb-5 flex flex-wrap gap-4 text-xs text-muted">
               {(Object.keys(levelMeta) as SkillLevel[]).map((l) => (
                 <span key={l} className="inline-flex items-center gap-2">
-                  <LevelDots level={l} /> {levelMeta[l].label}
+                  <LevelDots level={l} decorative /> {levelMeta[l].label}
                 </span>
               ))}
             </div>

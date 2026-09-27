@@ -112,7 +112,7 @@ export default function Contact() {
               </label>
               <button
                 type="submit"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-accent px-5 py-3.5 font-medium text-white shadow-soft transition hover:brightness-110"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-accent px-5 py-3.5 font-medium text-on-accent shadow-soft transition hover:brightness-110"
               >
                 <Send className="h-4 w-4" /> Send request
               </button>

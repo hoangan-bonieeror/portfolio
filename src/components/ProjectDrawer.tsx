@@ -212,11 +212,11 @@ function DrawerBody({ project: p, onClose }: { project: PersonalProject; onClose
 function MilestoneRow({ m, last, isCurrent }: { m: Milestone; last: boolean; isCurrent: boolean }) {
   const icon =
     m.state === "done" ? (
-      <span className="grid h-7 w-7 place-items-center rounded-full bg-mint text-white">
+      <span className="grid h-7 w-7 place-items-center rounded-full bg-mint text-bg">
         <Check className="h-4 w-4" strokeWidth={3} />
       </span>
     ) : m.state === "active" ? (
-      <span className="grid h-7 w-7 place-items-center rounded-full bg-accent text-white">
+      <span className="grid h-7 w-7 place-items-center rounded-full bg-accent text-on-accent">
         <Loader className="h-4 w-4 animate-[spin_3s_linear_infinite]" />
       </span>
     ) : (

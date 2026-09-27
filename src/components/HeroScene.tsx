@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { ContactShadows, Float, Html, Line, RoundedBox } from "@react-three/drei";
 import * as THREE from "three";
@@ -26,6 +26,38 @@ interface Props {
   palette: ScenePalette;
   animate: boolean;
   active: boolean;
+  /** Called once the first frames have rendered, so the page can fade the scene in. */
+  onReady?: () => void;
+}
+
+/** Soft round shadow texture, drawn once on a 2D canvas. */
+function useBlobTexture() {
+  return useMemo(() => {
+    const c = document.createElement("canvas");
+    c.width = c.height = 64;
+    const g = c.getContext("2d")!;
+    const grad = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+    grad.addColorStop(0, "rgba(0,0,0,0.55)");
+    grad.addColorStop(1, "rgba(0,0,0,0)");
+    g.fillStyle = grad;
+    g.fillRect(0, 0, 64, 64);
+    return new THREE.CanvasTexture(c);
+  }, []);
+}
+
+/**
+ * Counts rendered frames. After frame 2 the static contact shadow has been
+ * baked, so moving parts (the robot) can be added; after frame 4 the scene
+ * is shown.
+ */
+function FrameSignals({ onBaked, onReady }: { onBaked: () => void; onReady?: () => void }) {
+  const count = useRef(0);
+  useFrame(() => {
+    count.current += 1;
+    if (count.current === 2) onBaked();
+    if (count.current === 4) onReady?.();
+  });
+  return null;
 }
 
 /* Positions of the four nodes. */
@@ -134,8 +166,14 @@ function Robot({ p, animate }: { p: ScenePalette; animate: boolean }) {
     if (lidar.current) lidar.current.rotation.y = t * 4;
   });
   const wheel = p.dark ? "#2a2f47" : "#3b3f52";
+  const blob = useBlobTexture();
   return (
     <group ref={ref} position={ROBOT} rotation={[0, -0.5, 0]}>
+      {/* Its own soft shadow, so the baked contact shadow can stay static. */}
+      <mesh position={[0, -0.42, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[1.7, 1.4]} />
+        <meshBasicMaterial map={blob} transparent opacity={p.dark ? 0.9 : 0.6} depthWrite={false} />
+      </mesh>
       <RoundedBox args={[1.1, 0.42, 0.8]} radius={0.12} smoothness={4} position={[0, 0.12, 0]}>
         <meshStandardMaterial color={p.amber} roughness={0.35} />
       </RoundedBox>
@@ -260,7 +298,10 @@ function Rig({ children, animate }: { children: ReactNode; animate: boolean }) {
   );
 }
 
-export default function HeroScene({ palette: p, animate, active }: Props) {
+export default function HeroScene({ palette: p, animate, active, onReady }: Props) {
+  // The contact shadow is rendered once (cheap); the robot is added right after.
+  const [baked, setBaked] = useState(false);
+  const coarse = useMemo(() => window.matchMedia("(pointer: coarse)").matches, []);
   const curves = useMemo(
     () => ({
       clientApi: curveBetween(CLIENT.clone().add(new THREE.Vector3(0.3, -0.6, 0.2)), API.clone().add(new THREE.Vector3(0, 0.5, 0)), 0.4),
@@ -275,7 +316,7 @@ export default function HeroScene({ palette: p, animate, active }: Props) {
   return (
     <Canvas
       camera={{ position: [7.4, 6.2, 9.8], fov: 34 }}
-      dpr={[1, 1.75]}
+      dpr={coarse ? [1, 1.25] : [1, 1.5]}
       frameloop={active ? "always" : "never"}
       gl={{ antialias: true, alpha: true, powerPreference: "low-power" }}
       aria-hidden
@@ -285,6 +326,7 @@ export default function HeroScene({ palette: p, animate, active }: Props) {
       <directionalLight position={[5, 8, 6]} intensity={p.dark ? 1.3 : 1.6} />
       <directionalLight position={[-6, 3, -4]} intensity={0.35} color={p.dark ? "#3dd6ae" : "#ffffff"} />
 
+      <FrameSignals onBaked={() => setBaked(true)} onReady={onReady} />
       <group position={[-0.2, -0.3, 0]}>
         <Rig animate={animate}>
           {/* platform */}
@@ -299,7 +341,7 @@ export default function HeroScene({ palette: p, animate, active }: Props) {
           <Wrap speed={1.1} rotationIntensity={0.05} floatIntensity={0.2}>
             <Database p={p} />
           </Wrap>
-          <Robot p={p} animate={animate} />
+          {baked && <Robot p={p} animate={animate} />}
           <Wrap speed={1.2} rotationIntensity={0.1} floatIntensity={0.5}>
             <ClientWindow p={p} />
           </Wrap>
@@ -308,7 +350,7 @@ export default function HeroScene({ palette: p, animate, active }: Props) {
           <Packets curve={curves.apiDb} color={p.mint} animate={animate} count={3} speed={0.2} />
           <Packets curve={curves.apiRobot} color={p.amber} animate={animate} speed={0.24} />
 
-          <ContactShadows position={[0, -0.33, 0.3]} opacity={p.dark ? 0.5 : 0.3} scale={9} blur={2.4} far={3} frames={animate ? Infinity : 1} />
+          <ContactShadows position={[0, -0.325, 0.3]} opacity={p.dark ? 0.5 : 0.3} scale={[6.8, 4.4]} blur={2.4} far={1.6} frames={1} />
         </Rig>
       </group>
     </Canvas>

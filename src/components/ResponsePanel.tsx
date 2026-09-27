@@ -41,7 +41,7 @@ export function ResponsePanel({
             <span aria-hidden>·</span>
             {latency}ms
           </span>
-          <div className="flex rounded-lg border border-line bg-surface p-0.5" role="tablist" aria-label="Response view">
+          <div className="flex rounded-xl border border-line bg-surface p-1" role="tablist" aria-label="Response view">
             <TabButton active={tab === "preview"} onClick={() => setTab("preview")} icon={<Eye className="h-3.5 w-3.5" />}>
               Preview
             </TabButton>
@@ -73,8 +73,8 @@ function TabButton({
       role="tab"
       aria-selected={active}
       onClick={onClick}
-      className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition ${
-        active ? "bg-accent text-white shadow-sm" : "text-muted hover:text-ink"
+      className={`inline-flex min-h-9 items-center gap-1.5 rounded-md px-3 text-xs font-medium transition pointer-coarse:min-h-11 pointer-coarse:px-4 pointer-coarse:text-sm ${
+        active ? "bg-accent text-on-accent shadow-sm" : "text-muted hover:text-ink"
       }`}
     >
       {icon}

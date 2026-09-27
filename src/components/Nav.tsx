@@ -96,7 +96,7 @@ export default function Nav({ theme, onToggleTheme }: { theme: Theme; onToggleTh
           <button
             type="button"
             onClick={() => go("contact")}
-            className="hidden rounded-xl bg-accent px-4 py-2 text-sm font-medium text-white shadow-soft transition hover:brightness-110 sm:inline-flex"
+            className="hidden rounded-xl bg-accent px-4 py-2 text-sm font-medium text-on-accent shadow-soft transition hover:brightness-110 sm:inline-flex"
           >
             Hire me
           </button>
@@ -136,7 +136,7 @@ export default function Nav({ theme, onToggleTheme }: { theme: Theme; onToggleTh
             <button
               type="button"
               onClick={() => go("contact")}
-              className="mt-1 block w-full rounded-xl bg-accent px-4 py-3 text-left text-base font-medium text-white"
+              className="mt-1 block w-full rounded-xl bg-accent px-4 py-3 text-left text-base font-medium text-on-accent"
             >
               Hire me
             </button>

@@ -91,19 +91,38 @@ export function useActiveSection(ids: string[]) {
   const [active, setActive] = useState<string>("");
   const key = ids.join(",");
   useEffect(() => {
-    const els = key
-      .split(",")
-      .map((id) => document.getElementById(id))
-      .filter((el): el is HTMLElement => !!el);
-    const io = new IntersectionObserver(
-      (entries) => {
-        const visible = entries.filter((e) => e.isIntersecting);
-        if (visible.length) setActive(visible[0].target.id);
-      },
-      { rootMargin: "-45% 0px -50% 0px" },
-    );
-    els.forEach((el) => io.observe(el));
-    return () => io.disconnect();
+    const list = key.split(",");
+    let frame = 0;
+
+    const update = () => {
+      frame = 0;
+      const doc = document.documentElement;
+      // At the very bottom, the last section wins (it may be too short to reach the middle).
+      if (window.innerHeight + window.scrollY >= doc.scrollHeight - 4) {
+        setActive(list[list.length - 1]);
+        return;
+      }
+      // Otherwise: the last section whose top has passed the middle of the screen.
+      const line = window.innerHeight * 0.45;
+      let current = "";
+      for (const id of list) {
+        const el = document.getElementById(id);
+        if (el && el.getBoundingClientRect().top <= line) current = id;
+      }
+      setActive(current); // "" above the first section → nothing highlighted
+    };
+
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (frame) cancelAnimationFrame(frame);
+    };
   }, [key]);
   return active;
 }

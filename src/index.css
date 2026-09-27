@@ -15,9 +15,10 @@
   --line: #e3dfd6;
   --accent: #5146e5;
   --accent-soft: #e9e7fd;
-  --mint: #0f9a7a;
+  --on-accent: #ffffff;
+  --mint: #0b7a60;
   --mint-soft: #dcf5ee;
-  --amber: #c26a12;
+  --amber: #a3560c;
   --amber-soft: #fdeedd;
   --rose: #d93d52;
   --rose-soft: #fde5e8;
@@ -37,6 +38,7 @@
   --line: #272c44;
   --accent: #8b84ff;
   --accent-soft: #24234a;
+  --on-accent: #0d0f1a;
   --mint: #3dd6ae;
   --mint-soft: #133a33;
   --amber: #f5b06b;
@@ -59,6 +61,7 @@
   --color-line: var(--line);
   --color-accent: var(--accent);
   --color-accent-soft: var(--accent-soft);
+  --color-on-accent: var(--on-accent);
   --color-mint: var(--mint);
   --color-mint-soft: var(--mint-soft);
   --color-amber: var(--amber);
@@ -68,9 +71,9 @@
   --color-code-bg: var(--code-bg);
   --color-code-ink: var(--code-ink);
 
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Bricolage Grotesque", "Inter", ui-sans-serif, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-sans: "Inter Variable", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Bricolage Grotesque Variable", "Inter Variable", ui-sans-serif, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, monospace;
 
   --shadow-soft: var(--shadow);
   --shadow-lift: var(--shadow-lg);

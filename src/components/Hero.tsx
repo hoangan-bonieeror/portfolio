@@ -2,7 +2,8 @@ import { Suspense, lazy, useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { ArrowDown, ArrowRight, Download, MapPin } from "lucide-react";
 import { profile } from "../content";
-import { hasWebGL, useMediaQuery, type Theme } from "../lib/hooks";
+import { useMediaQuery, type Theme } from "../lib/hooks";
+import { useDeferred3D, usePageVisible } from "../lib/scene3d";
 import { Highlight, MethodBadge } from "./ui";
 import HeroFallback from "./HeroFallback";
 import type { ScenePalette } from "./HeroScene";
@@ -28,7 +29,9 @@ export default function Hero({ theme }: { theme: Theme }) {
   const reduce = useReducedMotion() ?? false;
   const [palette, setPalette] = useState<ScenePalette>(readPalette);
   const [inView, setInView] = useState(true);
-  const [webgl] = useState(hasWebGL);
+  const { ready: show3D } = useDeferred3D();
+  const pageVisible = usePageVisible();
+  const [sceneLive, setSceneLive] = useState(false);
   const small = useMediaQuery("(max-width: 639px)");
   const sceneRef = useRef<HTMLDivElement>(null);
 
@@ -49,8 +52,9 @@ export default function Hero({ theme }: { theme: Theme }) {
     reduce
       ? {}
       : {
-          initial: { opacity: 0, y: 18 },
-          animate: { opacity: 1, y: 0 },
+          // Slide only (no fade), so the headline counts as painted immediately.
+          initial: { y: 14 },
+          animate: { y: 0 },
           transition: { duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] as const },
         };
 
@@ -128,12 +132,21 @@ export default function Hero({ theme }: { theme: Theme }) {
           className="relative"
         >
           <div ref={sceneRef} className="relative isolate h-[340px] sm:h-[420px] lg:h-[480px]">
-            {webgl ? (
-              <Suspense fallback={<HeroFallback />}>
-                <HeroScene palette={palette} animate={!reduce} active={inView} />
-              </Suspense>
-            ) : (
+            {/* The CSS scene paints instantly; the 3D scene fades in over it once the page is idle. */}
+            <div className={`absolute inset-0 transition-opacity duration-700 ${sceneLive ? "opacity-0" : "opacity-100"}`}>
               <HeroFallback />
+            </div>
+            {show3D && (
+              <div className={`absolute inset-0 transition-opacity duration-700 ${sceneLive ? "opacity-100" : "opacity-0"}`}>
+                <Suspense fallback={null}>
+                  <HeroScene
+                    palette={palette}
+                    animate={!reduce}
+                    active={inView && pageVisible}
+                    onReady={() => setSceneLive(true)}
+                  />
+                </Suspense>
+              </div>
             )}
           </div>
 

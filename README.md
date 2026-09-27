@@ -30,6 +30,7 @@ npm run dev        # http://localhost:3000/portfolio/
 npm run build      # type-check + production build into dist/
 npm run preview    # serve the production build locally
 npm run deploy     # build and publish dist/ to the gh-pages branch
+npm run og         # regenerate the social preview image (public/og.png)
 ```
 
 ## Updating content
@@ -88,6 +89,30 @@ While `npm run dev` is running, the browser console warns about content mistakes
 can't catch — duplicate slugs, progress outside 0–100, a "shipped" project with unfinished
 milestones, and so on.
 
+## Social preview image
+
+When the link is shared (LinkedIn, Slack, X…), `public/og.png` is shown. It's generated from the
+real content, so after editing `src/content/profile.ts` or `skills.ts` run:
+
+```bash
+npm run og       # needs Chrome or Edge installed (or set CHROME_PATH)
+npm run deploy
+```
+
+LinkedIn caches previews — paste your URL into the
+[LinkedIn Post Inspector](https://www.linkedin.com/post-inspector/) once after deploying.
+
+## Performance & the 3D scene
+
+- The hero first paints a lightweight **CSS scene**. The **3D scene** (Three.js) loads only after the
+  page has loaded and the visitor starts interacting — or after ~3 s on desktop / ~8 s on phones —
+  then fades in.
+- Devices without WebGL, with **Data Saver** on, or **low-power phones** (≤ 4 cores or ≤ 3 GB RAM)
+  keep the CSS scene.
+- The 3D render loop pauses when the hero is off-screen or the tab is hidden.
+- Fonts are self-hosted (`@fontsource-variable/*`) and the two above-the-fold files are preloaded.
+- Testing: add `?3d=on` or `?3d=off` to the URL to force either version.
+
 ## Project structure
 
 ```
@@ -99,13 +124,17 @@ src/
   components/
     Hero.tsx          Headline + lazy 3D scene + floating response card
     HeroScene.tsx     React Three Fiber scene (client → API → DB / robot)
-    HeroFallback.tsx  CSS 3D fallback when WebGL is unavailable
+    HeroFallback.tsx  CSS 3D scene (first paint, and low-power fallback)
+    OgCard.tsx        1200×630 social preview card rendered at #/og
     ResponsePanel.tsx Preview / JSON "API response" frame
     TiltCard.tsx      3D tilt card with glare
     Projects.tsx      Filterable personal project cards
     ProjectDrawer.tsx Project detail: goal, progress, milestones, JSON
     About / Skills / Experience / Contact / Nav / Footer
   lib/hooks.ts        Theme, hash routing, media queries, scroll spy
+  lib/scene3d.ts      When/whether to start the 3D scene
+scripts/
+  og.mjs              Captures public/og.png
   index.css           Design tokens (light + dark) and utilities
 ```
 
