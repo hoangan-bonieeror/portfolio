@@ -7,25 +7,26 @@
    so light and dark themes stay in sync.
    ------------------------------------------------------------------ */
 :root {
-  --bg: #f6f4ef;
-  --surface: #ffffff;
-  --surface-2: #f0ede6;
-  --ink: #1b1d29;
-  --muted: #5e6173;
-  --line: #e3dfd6;
-  --accent: #5146e5;
-  --accent-soft: #e9e7fd;
+  /* Light theme: "latte" — foam, cream, caramel and espresso tones. */
+  --bg: #f4ece1;
+  --surface: #fbf7f1;
+  --surface-2: #efe5d8;
+  --ink: #2e231d;
+  --muted: #6b5a4e;
+  --line: #e3d6c6;
+  --accent: #8a5433;
+  --accent-soft: #f0e1d3;
   --on-accent: #ffffff;
-  --mint: #0b7a60;
-  --mint-soft: #dcf5ee;
-  --amber: #a3560c;
-  --amber-soft: #fdeedd;
-  --rose: #d93d52;
-  --rose-soft: #fde5e8;
-  --code-bg: #1b1d29;
-  --code-ink: #e6e8f2;
-  --shadow: 0 1px 2px rgb(27 29 41 / 0.04), 0 8px 24px -8px rgb(27 29 41 / 0.12);
-  --shadow-lg: 0 2px 4px rgb(27 29 41 / 0.04), 0 24px 48px -16px rgb(27 29 41 / 0.22);
+  --mint: #376a56;
+  --mint-soft: #dfebe2;
+  --amber: #a04a22;
+  --amber-soft: #f6e0d3;
+  --rose: #ae3244;
+  --rose-soft: #f7dee0;
+  --code-bg: #2a201a;
+  --code-ink: #ede6de;
+  --shadow: 0 1px 2px rgb(46 35 29 / 0.05), 0 8px 24px -8px rgb(46 35 29 / 0.14);
+  --shadow-lg: 0 2px 4px rgb(46 35 29 / 0.05), 0 24px 48px -16px rgb(46 35 29 / 0.25);
   color-scheme: light;
 }
 

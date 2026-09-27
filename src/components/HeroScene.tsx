@@ -107,7 +107,7 @@ function ApiServer({ p }: { p: ScenePalette }) {
           {/* front panel */}
           <mesh position={[0, 0, 0.655]}>
             <planeGeometry args={[1.6, 0.22]} />
-            <meshStandardMaterial color={p.dark ? "#1b1a3d" : "#3a31c4"} roughness={0.6} />
+            <meshStandardMaterial color={p.dark ? "#1b1a3d" : "#5e3a24"} roughness={0.6} />
           </mesh>
           {[0, 1, 2].map((j) => (
             <mesh
@@ -123,7 +123,7 @@ function ApiServer({ p }: { p: ScenePalette }) {
           ))}
           <mesh position={[0.45, 0, 0.66]}>
             <planeGeometry args={[0.55, 0.05]} />
-            <meshStandardMaterial color={p.dark ? "#4b45a8" : "#8d86f7"} />
+            <meshStandardMaterial color={p.dark ? "#4b45a8" : "#d6ad86"} />
           </mesh>
         </group>
       ))}
@@ -143,7 +143,7 @@ function Database({ p }: { p: ScenePalette }) {
           </mesh>
           <mesh position={[0, 0.141, 0]} rotation={[-Math.PI / 2, 0, 0]}>
             <ringGeometry args={[0.4, 0.46, 48]} />
-            <meshStandardMaterial color={p.dark ? "#1f8f74" : "#0b7a60"} />
+            <meshStandardMaterial color={p.dark ? "#1f8f74" : "#2c5646"} />
           </mesh>
         </group>
       ))}
@@ -322,7 +322,7 @@ export default function HeroScene({ palette: p, animate, active, onReady }: Prop
       aria-hidden
     >
       <ambientLight intensity={p.dark ? 0.55 : 0.85} />
-      <hemisphereLight args={[p.dark ? "#8b84ff" : "#ffffff", p.dark ? "#0d0f1a" : "#e8e2d6", p.dark ? 0.6 : 0.5]} />
+      <hemisphereLight args={[p.dark ? "#8b84ff" : "#ffffff", p.dark ? "#0d0f1a" : "#e6d6c2", p.dark ? 0.6 : 0.5]} />
       <directionalLight position={[5, 8, 6]} intensity={p.dark ? 1.3 : 1.6} />
       <directionalLight position={[-6, 3, -4]} intensity={0.35} color={p.dark ? "#3dd6ae" : "#ffffff"} />
 
@@ -333,7 +333,7 @@ export default function HeroScene({ palette: p, animate, active, onReady }: Prop
           <RoundedBox args={[7.0, 0.18, 4.6]} radius={0.09} smoothness={4} position={[0, -0.42, 0.3]}>
             <meshStandardMaterial color={p.surface} roughness={0.9} />
           </RoundedBox>
-          <gridHelper args={[7, 14, p.dark ? "#2b3150" : "#ddd6c8", p.dark ? "#20253d" : "#e9e4d9"]} position={[0, -0.32, 0.3]} scale={[1, 1, 4.5 / 7]} />
+          <gridHelper args={[7, 14, p.dark ? "#2b3150" : "#dccbb6", p.dark ? "#20253d" : "#e9ddce"]} position={[0, -0.32, 0.3]} scale={[1, 1, 4.5 / 7]} />
 
           <Wrap speed={1.4} rotationIntensity={0.08} floatIntensity={0.25}>
             <ApiServer p={p} />
