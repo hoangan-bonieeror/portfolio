@@ -39,6 +39,11 @@ export interface Profile {
   /** What you care about as an engineer — shown as cards in About. */
   principles: { title: string; body: string }[];
   email: string;
+  /**
+   * Optional photo for the hero avatar, e.g. "avatar.jpg" placed in /public.
+   * Leave empty ("") to show the illustrated avatar instead.
+   */
+  avatarUrl: string;
   /** Optional link to a PDF résumé. Leave empty ("") to hide the button. */
   resumeUrl: string;
   links: SocialLink[];

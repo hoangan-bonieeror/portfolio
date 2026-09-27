@@ -1,6 +1,7 @@
 import { Suspense, lazy, useEffect, useState } from "react";
 import { profile, skillGroups } from "../content";
 import { MethodBadge } from "./ui";
+import Avatar from "./Avatar";
 import type { ScenePalette } from "./HeroScene";
 
 const HeroScene = lazy(() => import("./HeroScene"));
@@ -32,7 +33,7 @@ export default function OgCard() {
   const topSkills = skillGroups
     .flatMap((g) => g.skills)
     .filter((s) => s.level === "daily")
-    .slice(0, 4)
+    .slice(0, 3)
     .map((s) => s.name);
 
   return (
@@ -47,7 +48,7 @@ export default function OgCard() {
 
       <div className="relative flex h-full">
         {/* Text */}
-        <div className="flex w-[640px] flex-col justify-between py-16 pl-18 pr-4">
+        <div className="flex w-[560px] flex-col justify-between py-16 pl-18 pr-4">
           <div>
             <div className="inline-flex items-center gap-2 rounded-xl border border-line bg-surface px-3 py-2 shadow-soft">
               <MethodBadge method="GET" />
@@ -75,11 +76,15 @@ export default function OgCard() {
 
         {/* 3D scene */}
         <div className="relative flex-1">
+          <div className="absolute left-1/2 top-[44%] z-10 -translate-x-1/2 -translate-y-1/2">
+            <Avatar size={170} />
+          </div>
           {palette && (
             <Suspense fallback={null}>
               <HeroScene
                 palette={palette}
                 animate={false}
+                fitWidth={12}
                 active
                 onReady={() => {
                   // Give the labels a moment to position, then signal the capture script.

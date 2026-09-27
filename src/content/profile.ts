@@ -44,6 +44,8 @@ export const profile: Profile = {
   ],
 
   email: "hoangan726@gmail.com",
+  // Put a square photo (e.g. "avatar.jpg") in /public and set it here to replace the illustration.
+  avatarUrl: "",
   // Add a link to your résumé PDF (e.g. "resume.pdf" placed in /public) to show a download button.
   resumeUrl: "",
 

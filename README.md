@@ -49,6 +49,8 @@ Tips:
 
 - Wrap a phrase in `*asterisks*` in the headline or About paragraphs to highlight it.
 - Set `resumeUrl: "resume.pdf"` in `profile.ts` and drop `resume.pdf` into `public/` to show a download button.
+- The hero shows an illustrated avatar in the middle. To use your photo instead, put a square image
+  (e.g. `avatar.jpg`, at least 420×420) in `public/` and set `avatarUrl: "avatar.jpg"` in `profile.ts`.
 - Add a logo for a skill by adding its key to `src/components/SkillIcon.tsx` (icons come from [Simple Icons via react-icons](https://react-icons.github.io/react-icons/icons/si/)).
 
 ### Adding or updating a personal project
@@ -104,11 +106,13 @@ LinkedIn caches previews — paste your URL into the
 
 ## Performance & the 3D scene
 
+- The hero centres the **avatar**, with the systems I work with (dashboard, Flask API, PostgreSQL,
+  ROS2 robot) orbiting around it.
 - The hero first paints a lightweight **CSS scene**. The **3D scene** (Three.js) loads only after the
   page has loaded and the visitor starts interacting — or after ~3 s on desktop / ~8 s on phones —
   then fades in.
-- Devices without WebGL, with **Data Saver** on, or **low-power phones** (≤ 4 cores or ≤ 3 GB RAM)
-  keep the CSS scene.
+- Phones, devices without WebGL, and anything with **Data Saver** on or low power (≤ 4 cores or
+  ≤ 3 GB RAM) keep the CSS scene.
 - The 3D render loop pauses when the hero is off-screen or the tab is hidden.
 - Fonts are self-hosted (`@fontsource-variable/*`) and the two above-the-fold files are preloaded.
 - Testing: add `?3d=on` or `?3d=off` to the URL to force either version.
@@ -122,8 +126,9 @@ public/
 src/
   content/            ← edit these to update the site
   components/
-    Hero.tsx          Headline + lazy 3D scene + floating response card
-    HeroScene.tsx     React Three Fiber scene (client → API → DB / robot)
+    Hero.tsx          Centred avatar, orbit scene (CSS → 3D), headline and CTAs
+    Avatar.tsx        Illustrated avatar (or your photo via profile.avatarUrl)
+    HeroScene.tsx     React Three Fiber orbit scene around the avatar
     HeroFallback.tsx  CSS 3D scene (first paint, and low-power fallback)
     OgCard.tsx        1200×630 social preview card rendered at #/og
     ResponsePanel.tsx Preview / JSON "API response" frame

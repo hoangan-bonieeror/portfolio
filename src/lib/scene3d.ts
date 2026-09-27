@@ -49,18 +49,26 @@ function whenIdle(cb: () => void, delayMs = 3000): () => void {
   let fired = false;
   const events = ["pointermove", "touchstart", "scroll", "keydown"] as const;
 
+  let loadedAt = 0;
+  const idle = () => {
+    if ("requestIdleCallback" in window) idleId = window.requestIdleCallback(cb, { timeout: 1500 });
+    else timer = setTimeout(cb, 200);
+  };
   const go = () => {
     if (fired) return;
     fired = true;
     cleanupTriggers();
-    if ("requestIdleCallback" in window) idleId = window.requestIdleCallback(cb, { timeout: 1500 });
-    else timer = setTimeout(cb, 200);
+    // Even after an early interaction, give the page ~2.5 s after load to settle first.
+    const wait = Math.max(0, 2500 - (performance.now() - loadedAt));
+    if (wait > 0) timer = setTimeout(idle, wait);
+    else idle();
   };
   const cleanupTriggers = () => {
     events.forEach((e) => window.removeEventListener(e, go));
     if (timer) clearTimeout(timer);
   };
   const arm = () => {
+    loadedAt = performance.now();
     events.forEach((e) => window.addEventListener(e, go, { once: true, passive: true }));
     timer = setTimeout(go, delayMs);
   };

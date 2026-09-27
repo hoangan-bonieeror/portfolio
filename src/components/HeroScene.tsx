@@ -1,12 +1,14 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { ContactShadows, Float, Html, Line, RoundedBox } from "@react-three/drei";
+import { useEffect, useMemo, useRef, type ReactNode } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Float, Html, Line, RoundedBox } from "@react-three/drei";
 import * as THREE from "three";
 
 /**
- * The hero's 3D scene: a tiny "system" of a client, an API server,
- * a PostgreSQL database and a factory robot, with data packets
- * travelling between them. It follows the cursor gently.
+ * The hero's 3D scene: an orbit around the avatar (which sits on top of
+ * the canvas as normal HTML). Around it float the systems An works with —
+ * a dashboard, a Flask API, a PostgreSQL database and a factory robot —
+ * with data packets travelling from the centre to each one.
+ * It follows the cursor gently.
  *
  * Loaded lazily (see Hero.tsx) so text renders before the 3D engine.
  */
@@ -28,6 +30,8 @@ interface Props {
   active: boolean;
   /** Called once the first frames have rendered, so the page can fade the scene in. */
   onReady?: () => void;
+  /** Scene width (in world units) that must fit the canvas; smaller = larger objects. */
+  fitWidth?: number;
 }
 
 /** Soft round shadow texture, drawn once on a 2D canvas. */
@@ -45,26 +49,35 @@ function useBlobTexture() {
   }, []);
 }
 
-/**
- * Counts rendered frames. After frame 2 the static contact shadow has been
- * baked, so moving parts (the robot) can be added; after frame 4 the scene
- * is shown.
- */
-function FrameSignals({ onBaked, onReady }: { onBaked: () => void; onReady?: () => void }) {
+/** Tells the page the scene is ready after a few rendered frames, so it can fade in. */
+function FrameSignals({ onReady }: { onReady?: () => void }) {
   const count = useRef(0);
   useFrame(() => {
     count.current += 1;
-    if (count.current === 2) onBaked();
     if (count.current === 4) onReady?.();
   });
   return null;
 }
 
-/* Positions of the four nodes. */
-const API = new THREE.Vector3(0, 0.55, 0);
-const DB = new THREE.Vector3(-2.5, 0.2, 1.3);
-const ROBOT = new THREE.Vector3(2.5, 0.1, 1.2);
-const CLIENT = new THREE.Vector3(-1.6, 2.2, -1.9);
+/** Soft shadow under a floating object. */
+function Blob({ size = 1.4, y = -0.5, opacity = 0.45 }: { size?: number; y?: number; opacity?: number }) {
+  const tex = useBlobTexture();
+  return (
+    <mesh position={[0, y, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      <planeGeometry args={[size, size * 0.8]} />
+      <meshBasicMaterial map={tex} transparent opacity={opacity} depthWrite={false} />
+    </mesh>
+  );
+}
+
+/* The avatar sits at the centre; the four systems orbit around it. */
+const CENTER = new THREE.Vector3(0, 0.35, 0);
+const FLOOR_Y = -0.75;
+const RING = 4.4;
+const API = new THREE.Vector3(4.7, 0.15, 0);
+const DB = new THREE.Vector3(-4.7, 0.2, -0.3);
+const ROBOT = new THREE.Vector3(Math.cos(2.05) * 4.4, FLOOR_Y + 0.33, Math.sin(2.05) * 4.4 * 0.9);
+const CLIENT = new THREE.Vector3(3.1, 2.5, -2.2);
 
 function curveBetween(a: THREE.Vector3, b: THREE.Vector3, lift = 1.1) {
   const mid = a.clone().add(b).multiplyScalar(0.5);
@@ -98,7 +111,8 @@ function ApiServer({ p }: { p: ScenePalette }) {
     });
   });
   return (
-    <group position={API}>
+    <group position={API} scale={0.72} rotation={[0, -0.45, 0]}>
+      <Blob size={2.6} y={-0.75} />
       {[0, 1, 2].map((i) => (
         <group key={i} position={[0, i * 0.44 - 0.44, 0]}>
           <RoundedBox args={[1.8, 0.36, 1.3]} radius={0.08} smoothness={4}>
@@ -127,14 +141,15 @@ function ApiServer({ p }: { p: ScenePalette }) {
           </mesh>
         </group>
       ))}
-      <Label text="api · flask" color={p.accent} y={0.95} />
+      <Label text="api · flask" color={p.accent} y={1.05} />
     </group>
   );
 }
 
 function Database({ p }: { p: ScenePalette }) {
   return (
-    <group position={DB}>
+    <group position={DB} scale={0.85}>
+      <Blob size={1.9} y={-0.5} />
       {[0, 1, 2].map((i) => (
         <group key={i} position={[0, i * 0.34 - 0.2, 0]}>
           <mesh>
@@ -159,18 +174,20 @@ function Robot({ p, animate }: { p: ScenePalette; animate: boolean }) {
     if (!animate) return;
     const t = clock.elapsedTime;
     if (ref.current) {
-      ref.current.position.x = ROBOT.x + Math.sin(t * 0.6) * 0.35;
-      ref.current.position.z = ROBOT.z + Math.cos(t * 0.6) * 0.2;
-      ref.current.rotation.y = -0.5 + Math.cos(t * 0.6) * 0.3;
+      // Drive back and forth along an arc of the orbit ring.
+      const a = 2.05 + Math.sin(t * 0.35) * 0.3;
+      ref.current.position.x = Math.cos(a) * RING;
+      ref.current.position.z = Math.sin(a) * RING * 0.9;
+      ref.current.rotation.y = -a + Math.PI / 2 + (Math.cos(t * 0.35) > 0 ? 0 : Math.PI);
     }
     if (lidar.current) lidar.current.rotation.y = t * 4;
   });
   const wheel = p.dark ? "#2a2f47" : "#3b3f52";
   const blob = useBlobTexture();
   return (
-    <group ref={ref} position={ROBOT} rotation={[0, -0.5, 0]}>
+    <group ref={ref} position={ROBOT} rotation={[0, 0.6, 0]} scale={0.8}>
       {/* Its own soft shadow, so the baked contact shadow can stay static. */}
-      <mesh position={[0, -0.42, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      <mesh position={[0, -0.24, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[1.7, 1.4]} />
         <meshBasicMaterial map={blob} transparent opacity={p.dark ? 0.9 : 0.6} depthWrite={false} />
       </mesh>
@@ -209,7 +226,7 @@ function Robot({ p, animate }: { p: ScenePalette; animate: boolean }) {
 
 function ClientWindow({ p }: { p: ScenePalette }) {
   return (
-    <group position={CLIENT} rotation={[0, 0.45, 0]}>
+    <group position={CLIENT} rotation={[0, -0.35, 0]} scale={0.8}>
       <RoundedBox args={[1.9, 1.2, 0.08]} radius={0.06} smoothness={4}>
         <meshStandardMaterial color={p.surface} roughness={0.5} />
       </RoundedBox>
@@ -284,29 +301,69 @@ function Rig({ children, animate }: { children: ReactNode; animate: boolean }) {
   useFrame(({ clock }, delta) => {
     if (!group.current) return;
     const idle = animate ? Math.sin(clock.elapsedTime * 0.25) * 0.12 : 0;
-    const targetY = -0.35 + idle + (animate ? pointer.current.x * 0.25 : 0);
-    const targetX = animate ? pointer.current.y * 0.06 : 0;
+    const targetY = idle + (animate ? pointer.current.x * 0.22 : 0);
+    const targetX = animate ? pointer.current.y * 0.05 : 0;
     const k = 1 - Math.pow(0.001, delta);
     group.current.rotation.y = THREE.MathUtils.lerp(group.current.rotation.y, targetY, k);
     group.current.rotation.x = THREE.MathUtils.lerp(group.current.rotation.x, targetX, k);
   });
 
   return (
-    <group ref={group} rotation={[0, -0.35, 0]}>
-      {children}
+    <group ref={group}>{children}</group>
+  );
+}
+
+/** Dashed orbit rings on the floor, with a few markers travelling round the outer one. */
+function Orbit({ p, animate }: { p: ScenePalette; animate: boolean }) {
+  const outer = useMemo(() => new THREE.EllipseCurve(0, 0, RING, RING * 0.9).getPoints(96).map((v) => new THREE.Vector3(v.x, FLOOR_Y, v.y)), []);
+  const inner = useMemo(() => new THREE.EllipseCurve(0, 0, 2.7, 2.45).getPoints(80).map((v) => new THREE.Vector3(v.x, FLOOR_Y, v.y)), []);
+  const markers = useRef<THREE.Mesh[]>([]);
+  useFrame(({ clock }) => {
+    markers.current.forEach((m, i) => {
+      if (!m) return;
+      const a = (animate ? clock.elapsedTime * 0.18 : 0) + (i * Math.PI * 2) / 3;
+      m.position.set(Math.cos(a) * RING, FLOOR_Y + 0.04, Math.sin(a) * RING * 0.9);
+    });
+  });
+  const ringColor = p.dark ? "#3a4066" : "#cdb59b";
+  return (
+    <group>
+      <mesh position={[0, FLOOR_Y - 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[5.2, 64]} />
+        <meshBasicMaterial color={p.surface} transparent opacity={p.dark ? 0.2 : 0.35} depthWrite={false} />
+      </mesh>
+      <Line points={outer} color={ringColor} lineWidth={1.5} dashed dashSize={0.18} gapSize={0.14} />
+      <Line points={inner} color={ringColor} lineWidth={1} transparent opacity={0.7} />
+      {[p.accent, p.mint, p.amber].map((c, i) => (
+        <mesh
+          key={i}
+          ref={(m) => {
+            if (m) markers.current[i] = m;
+          }}
+        >
+          <sphereGeometry args={[0.07, 16, 16]} />
+          <meshStandardMaterial color={c} emissive={c} emissiveIntensity={1.2} />
+        </mesh>
+      ))}
     </group>
   );
 }
 
-export default function HeroScene({ palette: p, animate, active, onReady }: Props) {
-  // The contact shadow is rendered once (cheap); the robot is added right after.
-  const [baked, setBaked] = useState(false);
+/** Shrinks the whole scene on narrow canvases (phones) so nothing is cut off. */
+function Fit({ children, fitWidth }: { children: ReactNode; fitWidth: number }) {
+  const width = useThree((s) => s.viewport.width);
+  const scale = Math.min(1, width / fitWidth);
+  return <group scale={scale}>{children}</group>;
+}
+
+export default function HeroScene({ palette: p, animate, active, onReady, fitWidth = 12.8 }: Props) {
   const coarse = useMemo(() => window.matchMedia("(pointer: coarse)").matches, []);
   const curves = useMemo(
     () => ({
-      clientApi: curveBetween(CLIENT.clone().add(new THREE.Vector3(0.3, -0.6, 0.2)), API.clone().add(new THREE.Vector3(0, 0.5, 0)), 0.4),
-      apiDb: curveBetween(API.clone().add(new THREE.Vector3(-0.8, 0, 0.3)), DB.clone().add(new THREE.Vector3(0.4, 0.4, 0)), 0.9),
-      apiRobot: curveBetween(API.clone().add(new THREE.Vector3(0.8, 0, 0.3)), ROBOT.clone().add(new THREE.Vector3(-0.3, 0.4, 0)), 0.9),
+      toClient: curveBetween(CENTER, CLIENT.clone().add(new THREE.Vector3(-0.6, -0.4, 0.2)), 0.5),
+      toApi: curveBetween(CENTER, API.clone().add(new THREE.Vector3(-0.7, 0.1, 0)), 0.7),
+      toDb: curveBetween(CENTER, DB.clone().add(new THREE.Vector3(0.6, 0.1, 0)), 0.7),
+      toRobot: curveBetween(CENTER, ROBOT.clone().add(new THREE.Vector3(0.3, 0.2, -0.2)), 0.4),
     }),
     [],
   );
@@ -315,7 +372,7 @@ export default function HeroScene({ palette: p, animate, active, onReady }: Prop
 
   return (
     <Canvas
-      camera={{ position: [7.4, 6.2, 9.8], fov: 34 }}
+      camera={{ position: [0, 3.6, 10.5], fov: 32 }}
       dpr={coarse ? [1, 1.25] : [1, 1.5]}
       frameloop={active ? "always" : "never"}
       gl={{ antialias: true, alpha: true, powerPreference: "low-power" }}
@@ -326,14 +383,15 @@ export default function HeroScene({ palette: p, animate, active, onReady }: Prop
       <directionalLight position={[5, 8, 6]} intensity={p.dark ? 1.3 : 1.6} />
       <directionalLight position={[-6, 3, -4]} intensity={0.35} color={p.dark ? "#3dd6ae" : "#ffffff"} />
 
-      <FrameSignals onBaked={() => setBaked(true)} onReady={onReady} />
-      <group position={[-0.2, -0.3, 0]}>
+      <FrameSignals onReady={onReady} />
+      {/* Workaround: with React 19 + StrictMode, the first drei <Html> mounted can
+          stay empty. This invisible one takes that slot so every label renders. */}
+      <Html style={{ display: "none" }}>
+        <span />
+      </Html>
+      <Fit fitWidth={fitWidth}>
         <Rig animate={animate}>
-          {/* platform */}
-          <RoundedBox args={[7.0, 0.18, 4.6]} radius={0.09} smoothness={4} position={[0, -0.42, 0.3]}>
-            <meshStandardMaterial color={p.surface} roughness={0.9} />
-          </RoundedBox>
-          <gridHelper args={[7, 14, p.dark ? "#2b3150" : "#dccbb6", p.dark ? "#20253d" : "#e9ddce"]} position={[0, -0.32, 0.3]} scale={[1, 1, 4.5 / 7]} />
+          <Orbit p={p} animate={animate} />
 
           <Wrap speed={1.4} rotationIntensity={0.08} floatIntensity={0.25}>
             <ApiServer p={p} />
@@ -341,18 +399,17 @@ export default function HeroScene({ palette: p, animate, active, onReady }: Prop
           <Wrap speed={1.1} rotationIntensity={0.05} floatIntensity={0.2}>
             <Database p={p} />
           </Wrap>
-          {baked && <Robot p={p} animate={animate} />}
+          <Robot p={p} animate={animate} />
           <Wrap speed={1.2} rotationIntensity={0.1} floatIntensity={0.5}>
             <ClientWindow p={p} />
           </Wrap>
 
-          <Packets curve={curves.clientApi} color={p.accent} animate={animate} speed={0.28} />
-          <Packets curve={curves.apiDb} color={p.mint} animate={animate} count={3} speed={0.2} />
-          <Packets curve={curves.apiRobot} color={p.amber} animate={animate} speed={0.24} />
-
-          <ContactShadows position={[0, -0.325, 0.3]} opacity={p.dark ? 0.5 : 0.3} scale={[6.8, 4.4]} blur={2.4} far={1.6} frames={1} />
+          <Packets curve={curves.toClient} color={p.accent} animate={animate} speed={0.26} />
+          <Packets curve={curves.toApi} color={p.accent} animate={animate} speed={0.22} />
+          <Packets curve={curves.toDb} color={p.mint} animate={animate} count={3} speed={0.2} />
+          <Packets curve={curves.toRobot} color={p.amber} animate={animate} speed={0.24} />
         </Rig>
-      </group>
+      </Fit>
     </Canvas>
   );
 }

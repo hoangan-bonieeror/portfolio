@@ -66,7 +66,7 @@ export default function Nav({ theme, onToggleTheme }: { theme: Theme; onToggleTh
           </span>
         </a>
 
-        <div className="hidden items-center gap-1 md:flex">
+        <div className="hidden items-center gap-1 lg:flex">
           {links.map((l) => (
             <button
               key={l.id}
@@ -96,14 +96,14 @@ export default function Nav({ theme, onToggleTheme }: { theme: Theme; onToggleTh
           <button
             type="button"
             onClick={() => go("contact")}
-            className="hidden rounded-xl bg-accent px-4 py-2 text-sm font-medium text-on-accent shadow-soft transition hover:brightness-110 sm:inline-flex"
+            className="hidden whitespace-nowrap rounded-xl bg-accent px-4 py-2 text-sm font-medium text-on-accent shadow-soft transition hover:brightness-110 sm:inline-flex"
           >
             Hire me
           </button>
           <button
             type="button"
             onClick={() => setOpen((o) => !o)}
-            className="grid h-10 w-10 place-items-center rounded-xl text-muted transition hover:bg-surface-2 hover:text-ink md:hidden"
+            className="grid h-10 w-10 place-items-center rounded-xl text-muted transition hover:bg-surface-2 hover:text-ink lg:hidden"
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
           >
@@ -119,7 +119,7 @@ export default function Nav({ theme, onToggleTheme }: { theme: Theme; onToggleTh
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.18 }}
-            className="mx-auto mt-2 max-w-6xl rounded-2xl border border-line bg-surface p-2 shadow-lift md:hidden"
+            className="mx-auto mt-2 max-w-6xl rounded-2xl border border-line bg-surface p-2 shadow-lift lg:hidden"
           >
             {links.map((l) => (
               <button
