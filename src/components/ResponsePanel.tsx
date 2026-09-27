@@ -28,7 +28,7 @@ export function ResponsePanel({
   const latency = useMemo(() => 8 + (path.length * 7) % 23, [path]);
 
   return (
-    <div className={`overflow-hidden rounded-2xl border border-line bg-surface shadow-soft ${className}`}>
+    <div className={`min-w-0 overflow-hidden rounded-2xl border border-line bg-surface shadow-soft ${className}`}>
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-line bg-surface-2/60 px-4 py-2.5">
         <div className="flex min-w-0 items-center gap-2">
           <MethodBadge method={method} />

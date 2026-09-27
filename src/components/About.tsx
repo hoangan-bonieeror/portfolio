@@ -23,7 +23,7 @@ export default function About() {
           <EndpointHeading path="/v1/about" title="A bit about me" lead="The short version: I like making data move reliably from where it's created to where it's useful." />
         </Reveal>
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.4fr_1fr]">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
           <Reveal>
             <ResponsePanel path="/v1/about" data={json}>
               <div className="space-y-4 text-[17px] leading-relaxed text-muted">

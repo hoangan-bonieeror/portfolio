@@ -40,7 +40,7 @@ export default function Contact() {
   return (
     <section id="contact" className="py-20 sm:py-28">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1fr_1.1fr] lg:gap-14">
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-14">
           <Reveal>
             <div className="mb-3 inline-flex items-center gap-2 rounded-lg border border-line bg-surface px-2 py-1.5 shadow-soft">
               <MethodBadge method="POST" />

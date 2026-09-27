@@ -68,7 +68,7 @@ export function JsonView({ data, maxHeight = 420 }: { data: unknown; maxHeight?:
         {copied ? "Copied" : "Copy"}
       </button>
       <pre
-        className="scroll-thin overflow-auto p-4 pr-20 font-mono text-[12.5px] leading-relaxed"
+        className="scroll-thin overflow-auto whitespace-pre-wrap p-4 pr-4 pt-12 font-mono text-[12.5px] leading-relaxed [overflow-wrap:anywhere] sm:pr-20 sm:pt-4"
         style={{ maxHeight }}
       >
         <code>{render(data, 0)}</code>
